@@ -108,6 +108,8 @@ classdef SCM < handle
             obj.AoA_L = 0;
             
             % 방사 패턴 초기값 설정
+            % Radiation Power Pattern이 A(theta, phi) 일 때, mono-pole이면 sqrt(A(theta, phi))
+            % Cross-pole인 경우 sqrt(A(theta, phi))*cos(angle)과 sqrt(A(theta, phi))*sin(angle)
             obj.tx_theta = @(theta, phi) 1;
             obj.tx_phi = @(theta, phi) 0;
             obj.rx_theta = @(theta, phi) 1;
