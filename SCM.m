@@ -3,75 +3,75 @@
 
 classdef SCM < handle
     
-    % Ã¤³Î¸ðµ¨ È¯°æ º¯¼ö
+    % ì±„ë„ëª¨ë¸ í™˜ê²½ ë³€ìˆ˜
     properties
-        % Small scale º¯¼ö
-        fc              % ½ÅÈ£ÀÇ Áß½É ÁÖÆÄ¼ö (Center Frequency), default: 800MHz
-        lamda           % ½ÅÈ£ÀÇ ÆÄÀå
-        fs              % Ã¤³ÎÀÇ sampling frequency
-        Ts              % Ã¤³ÎÀÇ sampling period
-        tx_ant          % ¼Û½Å´ÜÀÇ ¾ÈÅ×³ª ¹è¿­ Á¤º¸ [ row  col  row_dis  col_dis ]
-        rx_ant          % ¼ö½Å´ÜÀÇ ¾ÈÅ×³ª ¹è¿­ Á¤º¸ [ row  col  row_dis  col_dis ]
-        tx_d            % ¼Û½Å´ÜÀÇ ¾ÈÅ×³ª À§Ä¡ Çà·Ä
-        rx_d            % ¼ö½Å´ÜÀÇ ¾ÈÅ×³ª À§Ä¡ Çà·Ä
-        Ntx             % ¼Û½Å´ÜÀÇ ¾ÈÅ×³ª ¼ö
-        Nrx             % ¼ö½Å´ÜÀÇ ¾ÈÅ×³ª ¼ö
-        n_path          % Ã¤³ÎÀÇ path(cluster)ÀÇ ¼ö
-        n_mray          % Ã¤³ÎÀÇ path´ç rayÀÇ ÃÖ´ë °³¼ö
-        n_ray           % Ã¤³ÎÀÇ path´ç rayÀÇ ¼ö
-        asd             % ASD °ª
-        zsd             % ZSD °ª
-        asa             % ASA °ª
-        zsa             % ZSA °ª
-        xpr_mu          % Á÷±³ ÆÐÅÏ°£ °£¼· ºñÀ² ±â´ñ°ª 10^(x/10), x-normal dist
-        xpr_std         % Á÷±³ ÆÐÅÏ°£ °£¼· ºñÀ² Ç¥ÁØÆíÂ÷ 10^(x/10), x-normal dist
+        % Small scale ë³€ìˆ˜
+        fc              % ì‹ í˜¸ì˜ ì¤‘ì‹¬ ì£¼íŒŒìˆ˜ (Center Frequency), default: 800MHz
+        lamda           % ì‹ í˜¸ì˜ íŒŒìž¥
+        fs              % ì±„ë„ì˜ sampling frequency
+        Ts              % ì±„ë„ì˜ sampling period
+        tx_ant          % ì†¡ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ë°°ì—´ ì •ë³´ [ row  col  row_dis  col_dis ]
+        rx_ant          % ìˆ˜ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ë°°ì—´ ì •ë³´ [ row  col  row_dis  col_dis ]
+        tx_d            % ì†¡ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìœ„ì¹˜ í–‰ë ¬
+        rx_d            % ìˆ˜ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìœ„ì¹˜ í–‰ë ¬
+        Ntx             % ì†¡ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìˆ˜
+        Nrx             % ìˆ˜ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìˆ˜
+        n_path          % ì±„ë„ì˜ path(cluster)ì˜ ìˆ˜
+        n_mray          % ì±„ë„ì˜ pathë‹¹ rayì˜ ìµœëŒ€ ê°œìˆ˜
+        n_ray           % ì±„ë„ì˜ pathë‹¹ rayì˜ ìˆ˜
+        asd             % ASD ê°’
+        zsd             % ZSD ê°’
+        asa             % ASA ê°’
+        zsa             % ZSA ê°’
+        xpr_mu          % ì§êµ íŒ¨í„´ê°„ ê°„ì„­ ë¹„ìœ¨ ê¸°ëŒ“ê°’ 10^(x/10), x-normal dist
+        xpr_std         % ì§êµ íŒ¨í„´ê°„ ê°„ì„­ ë¹„ìœ¨ í‘œì¤€íŽ¸ì°¨ 10^(x/10), x-normal dist
         pdp             % Power Delay Profile (PDP)
         
-        % Large scale º¯¼ö
-        Gt              % ¼Û½Å´ÜÀÇ ¾ÈÅ×³ª Gain [dB]
-        Gr              % ¼ö½Å´ÜÀÇ ¾ÈÅ×³ª Gain [dB]
-        L               % ½Ã½ºÅÛ loss factor [dB]
-        distance_rate   % °Å¸® 1ÀÎ Ã¤³Î¿¡ ´ëÇÑ »ó´ëÀûÀÎ °Å¸® ºñÀ²
+        % Large scale ë³€ìˆ˜
+        Gt              % ì†¡ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ Gain [dB]
+        Gr              % ìˆ˜ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ Gain [dB]
+        L               % ì‹œìŠ¤í…œ loss factor [dB]
+        distance_rate   % ê±°ë¦¬ 1ì¸ ì±„ë„ì— ëŒ€í•œ ìƒëŒ€ì ì¸ ê±°ë¦¬ ë¹„ìœ¨
         exp_beta        % Path loss exponent
-        sdw_std         % Shadowing ±â´ÉÀÇ Ç¥ÁØÆíÂ÷, default: 0
-        los             % LOS(Line of Sight) È¯°æÀ» ¹Ý¿µÇÒÁö °áÁ¤ÇÏ´Â º¯¼ö 1: LOS, 0: non-LOS
-        K               % LOS¿Í non-LOS ½ÅÈ£ Àü·Â »çÀÌÀÇ ºñÀ² [dB]
-        No              % AWGNÀÇ PSD, default: -174 [dB/Hz] (-204 [dbm/Hz])
-        ZoD_L           % LOS ¹æÇâÀÇ ZoD
-        AoD_L           % LOS ¹æÇâÀÇ AoD
-        ZoA_L           % LOS ¹æÇâÀÇ ZoA
-        AoA_L           % LOS ¹æÇâÀÇ AoA
-        p_src           % ¼Û½Å´ÜÀÇ 3Â÷¿ø À§Ä¡
-        p_dst           % ¼ö½Å´ÜÀÇ 3Â÷¿ø À§Ä¡
-        abr_src         % ¼Û½Å´ÜÀÇ 3Â÷¿ø ¾ÈÅ×³ª ÁöÇâ ¹æÇâ (alpha, beta, gamma)
-        abr_dst         % ¼ö½Å´ÜÀÇ 3Â÷¿ø ¾ÈÅ×³ª ÁöÇâ ¹æÇâ (alpha, beta, gamma)
-        los_flag        % LOS È¯°æ check¸¦ À§ÇÑ ³»ºÎ º¯¼ö
+        sdw_std         % Shadowing ê¸°ëŠ¥ì˜ í‘œì¤€íŽ¸ì°¨, default: 0
+        los             % LOS(Line of Sight) í™˜ê²½ì„ ë°˜ì˜í• ì§€ ê²°ì •í•˜ëŠ” ë³€ìˆ˜ 1: LOS, 0: non-LOS
+        K               % LOSì™€ non-LOS ì‹ í˜¸ ì „ë ¥ ì‚¬ì´ì˜ ë¹„ìœ¨ [dB]
+        No              % AWGNì˜ PSD, default: -174 [dB/Hz] (-204 [dbm/Hz])
+        ZoD_L           % LOS ë°©í–¥ì˜ ZoD
+        AoD_L           % LOS ë°©í–¥ì˜ AoD
+        ZoA_L           % LOS ë°©í–¥ì˜ ZoA
+        AoA_L           % LOS ë°©í–¥ì˜ AoA
+        p_src           % ì†¡ì‹ ë‹¨ì˜ 3ì°¨ì› ìœ„ì¹˜
+        p_dst           % ìˆ˜ì‹ ë‹¨ì˜ 3ì°¨ì› ìœ„ì¹˜
+        abr_src         % ì†¡ì‹ ë‹¨ì˜ 3ì°¨ì› ì•ˆí…Œë‚˜ ì§€í–¥ ë°©í–¥ (alpha, beta, gamma)
+        abr_dst         % ìˆ˜ì‹ ë‹¨ì˜ 3ì°¨ì› ì•ˆí…Œë‚˜ ì§€í–¥ ë°©í–¥ (alpha, beta, gamma)
+        los_flag        % LOS í™˜ê²½ checkë¥¼ ìœ„í•œ ë‚´ë¶€ ë³€ìˆ˜
         
-        % ¹æ»ç ÆÐÅÏ ÇÔ¼ö ¹× º¯¼ö
-        tx_theta        % ¼Û½Å´ÜÀÇ ¼öÁ÷ ¹æ»çÆÐÅÏ
-        tx_phi          % ¼Û½Å´ÜÀÇ ¼öÆò ¹æ»çÆÐÅÏ
-        rx_theta        % ¼ö½Å´ÜÀÇ ¼öÁ÷ ¹æ»çÆÐÅÏ
-        rx_phi          % ¼ö½Å´ÜÀÇ ¼öÆò ¹æ»çÆÐÅÏ
+        % ë°©ì‚¬ íŒ¨í„´ í•¨ìˆ˜ ë° ë³€ìˆ˜
+        tx_theta        % ì†¡ì‹ ë‹¨ì˜ ìˆ˜ì§ ë°©ì‚¬íŒ¨í„´
+        tx_phi          % ì†¡ì‹ ë‹¨ì˜ ìˆ˜í‰ ë°©ì‚¬íŒ¨í„´
+        rx_theta        % ìˆ˜ì‹ ë‹¨ì˜ ìˆ˜ì§ ë°©ì‚¬íŒ¨í„´
+        rx_phi          % ìˆ˜ì‹ ë‹¨ì˜ ìˆ˜í‰ ë°©ì‚¬íŒ¨í„´
         
-        % ±âÅ¸ ÇÔ¼ö ¹× ¸ðµ¨ º¯¼ö
-        cvt_S2R         % ¿øÅëÁÂÇ¥¸¦ Á÷±³ÁÂÇ¥·Î º¯È¯ÇÏ´Â ÇÔ¼ö
-        R_mat           % GCS¿Í LCS°£ º¯È¯À» À§ÇÑ Çà·Ä °è»ê ÇÔ¼ö
-        model_var       % ¸ðµ¨ ÇÔ¼ö ½ÇÇàÀ» À§ÇÑ º¯¼ö ÀúÀå
+        % ê¸°íƒ€ í•¨ìˆ˜ ë° ëª¨ë¸ ë³€ìˆ˜
+        cvt_S2R         % ì›í†µì¢Œí‘œë¥¼ ì§êµì¢Œí‘œë¡œ ë³€í™˜í•˜ëŠ” í•¨ìˆ˜
+        R_mat           % GCSì™€ LCSê°„ ë³€í™˜ì„ ìœ„í•œ í–‰ë ¬ ê³„ì‚° í•¨ìˆ˜
+        model_var       % ëª¨ë¸ í•¨ìˆ˜ ì‹¤í–‰ì„ ìœ„í•œ ë³€ìˆ˜ ì €ìž¥
     end
     
     
-    % Ã¤³Î¸ðµ¨ ÇÔ¼ö
+    % ì±„ë„ëª¨ë¸ í•¨ìˆ˜
     methods
-        % »ý¼ºÀÚ ===========================================================
+        % ìƒì„±ìž ===========================================================
         function obj = SCM()
             
-            % 3Â÷¿ø À§Ä¡ ¹× ¼Û¼ö½Å ÁöÇâ ¹æÇâ ÃÊ±âÈ­
+            % 3ì°¨ì› ìœ„ì¹˜ ë° ì†¡ìˆ˜ì‹  ì§€í–¥ ë°©í–¥ ì´ˆê¸°í™”
             obj.p_src = [0 0 0];
             obj.p_dst = [1 0 0];
             obj.abr_src = [0 0 0];
             obj.abr_dst = [pi 0 0];
             
-            % Small scale ÃÊ±â°ª ¼³Á¤
+            % Small scale ì´ˆê¸°ê°’ ì„¤ì •
             obj.fc = 800e6;
             obj.lamda = [];
             obj.fs = 20e6;
@@ -91,7 +91,7 @@ classdef SCM < handle
             obj.xpr_std = 3;
             obj.pdp = [];
             
-            % Large scale ÃÊ±â°ª ¼³Á¤
+            % Large scale ì´ˆê¸°ê°’ ì„¤ì •
             obj.Gt = 0;
             obj.Gr = 0;
             obj.L = 0;
@@ -107,13 +107,13 @@ classdef SCM < handle
             obj.ZoA_L = pi/2;
             obj.AoA_L = 0;
             
-            % ¹æ»ç ÆÐÅÏ ÃÊ±â°ª ¼³Á¤
-            obj.tx_theta = @(phi, theta) 1;
-            obj.tx_phi = @(phi, theta) 0;
-            obj.rx_theta = @(phi, theta) 1;
-            obj.rx_phi = @(phi, theta) 0;
+            % ë°©ì‚¬ íŒ¨í„´ ì´ˆê¸°ê°’ ì„¤ì •
+            obj.tx_theta = @(theta, phi) 1;
+            obj.tx_phi = @(theta, phi) 0;
+            obj.rx_theta = @(theta, phi) 1;
+            obj.rx_phi = @(theta, phi) 0;
             
-            % ÇÔ¼ö ÃÊ±âÈ­
+            % í•¨ìˆ˜ ì´ˆê¸°í™”
             obj.cvt_S2R = @(theta, phi) [sin(theta).*cos(phi); sin(theta).*sin(phi); cos(theta)];
             obj.R_mat = @(alpha, beta, gamma) ...
                 [cos(alpha) -sin(alpha) 0; sin(alpha) cos(alpha) 0; 0 0 1] * ...
@@ -122,18 +122,18 @@ classdef SCM < handle
         end
         
         
-        % ¼Û¼ö½Å À§Ä¡¸¦ ÃÊ±âÈ­ ÇÏ´Â ÇÔ¼ö
+        % ì†¡ìˆ˜ì‹  ìœ„ì¹˜ë¥¼ ì´ˆê¸°í™” í•˜ëŠ” í•¨ìˆ˜
         function [res_ang, los_flag] = position(obj, p_src, p_dst, abr_src, abr_dst)
             
-            % ¼Û¼ö½Å ÁöÇâ ¹æÇâ ÃÊ±âÈ­(±¸ÁÂÇ¥°è ±âÁØ)
+            % ì†¡ìˆ˜ì‹  ì§€í–¥ ë°©í–¥ ì´ˆê¸°í™”(êµ¬ì¢Œí‘œê³„ ê¸°ì¤€)
             if nargin < 5
-                % ¼Û½Å±â ¾ÈÅ×³ª ÁöÇâ ¹æÇâ ÃÊ±âÈ­
+                % ì†¡ì‹ ê¸° ì•ˆí…Œë‚˜ ì§€í–¥ ë°©í–¥ ì´ˆê¸°í™”
                 R = obj.R_mat(0, 0, 0);
                 src_tmp = p_dst - p_src;
                 src_tmp = src_tmp / norm(src_tmp);
                 obj.abr_src = [angle([1 1j 0] * R.' * src_tmp.') -( pi/2 - acos([0 0 1] * R.' * src_tmp.') ) 0];
                 
-                % ¼ö½Å±â ¾ÈÅ×³ª ÁöÇâ ¹æÇâ ÃÊ±âÈ­
+                % ìˆ˜ì‹ ê¸° ì•ˆí…Œë‚˜ ì§€í–¥ ë°©í–¥ ì´ˆê¸°í™”
                 dst_tmp = p_src - p_dst;
                 dst_tmp = dst_tmp / norm(dst_tmp);
                 obj.abr_dst = [angle([1 1j 0] * R.' * dst_tmp.') -( pi/2 - acos([0 0 1] * R.' * dst_tmp.') ) 0];
@@ -142,25 +142,25 @@ classdef SCM < handle
                 obj.abr_dst = abr_dst;
             end
             
-            % 3Â÷¿ø À§Ä¡ º¯¼ö ÃÊ±âÈ­(Á÷±³ÁÂÇ¥°è ±âÁØ)
+            % 3ì°¨ì› ìœ„ì¹˜ ë³€ìˆ˜ ì´ˆê¸°í™”(ì§êµì¢Œí‘œê³„ ê¸°ì¤€)
             obj.p_src = p_src;
             obj.p_dst = p_dst;
             
-            % ¼Û½Å LOS °¢µµ °è»ê
+            % ì†¡ì‹  LOS ê°ë„ ê³„ì‚°
             src_tmp = obj.p_dst - obj.p_src;
             src_tmp = src_tmp / norm(src_tmp);
             R = obj.R_mat(obj.abr_src(1), obj.abr_src(2), obj.abr_src(3));
             obj.ZoD_L = acos([0 0 1] * R.' * src_tmp.');
             obj.AoD_L = angle([1 1j 0] * R.' * src_tmp.');
             
-            % ¼ö½Å LOS °¢µµ °è»ê
+            % ìˆ˜ì‹  LOS ê°ë„ ê³„ì‚°
             dst_tmp = obj.p_src - obj.p_dst;
             dst_tmp = dst_tmp / norm(dst_tmp);
             R = obj.R_mat(obj.abr_dst(1), obj.abr_dst(2), obj.abr_dst(3));
             obj.ZoA_L = acos([0 0 1] * R.' * dst_tmp.');
             obj.AoA_L = angle([1 1j 0] * R.' * dst_tmp.');
             
-            % LOS°¡ °¡´ÉÇÑ È¯°æÀÎÁö Á¡°Ë
+            % LOSê°€ ê°€ëŠ¥í•œ í™˜ê²½ì¸ì§€ ì ê²€
             flag = zeros(1,4);
             if (obj.ZoD_L >= 0) && ( abs(obj.ZoD_L) <= pi ), flag(1) = 1; end
             if abs(obj.AoD_L) <= pi/2, flag(2) = 1; end
@@ -168,16 +168,16 @@ classdef SCM < handle
             if abs(obj.AoA_L) <= pi/2, flag(4) = 1; end
             if sum(flag) == 4, obj.los_flag = 1; end
             
-            % °á°ú ¹ÝÈ¯
+            % ê²°ê³¼ ë°˜í™˜
             los_flag = obj.los_flag;
             res_ang = [obj.ZoD_L obj.AoD_L obj.ZoA_L obj.AoA_L];
         end
         
         
-        % Á÷»ç°¢ ¹è¿­ ¾ÈÅ×³ª¸¦ ±â¹ÝÀ¸·Î ¾ÈÅ×³ª À§Ä¡ Çà·ÄÀ» ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö ====
+        % ì§ì‚¬ê° ë°°ì—´ ì•ˆí…Œë‚˜ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ì•ˆí…Œë‚˜ ìœ„ì¹˜ í–‰ë ¬ì„ ì´ˆê¸°í™”í•˜ëŠ” í•¨ìˆ˜ ====
         function [] = init_d(obj)
             
-            % ¼Û½Å´ÜÀÇ ¾ÈÅ×³ª À§Ä¡ Çà·Ä
+            % ì†¡ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìœ„ì¹˜ í–‰ë ¬
             obj.Ntx = obj.tx_ant(1) * obj.tx_ant(2);
             tdy = obj.tx_ant(3) * obj.lamda;    
             tdz = obj.tx_ant(4) * obj.lamda;
@@ -185,7 +185,7 @@ classdef SCM < handle
             temp2 = repmat(0:obj.tx_ant(2)-1, 1, obj.tx_ant(1));
             obj.tx_d = [ zeros(obj.Ntx,1) temp1(:)*tdy (temp2.')*tdz];
             
-            % ¼ö½Å´ÜÀÇ ¾ÈÅ×³ª À§Ä¡ Çà·Ä
+            % ìˆ˜ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìœ„ì¹˜ í–‰ë ¬
             obj.Nrx = obj.rx_ant(1) * obj.rx_ant(2);
             rdy = obj.rx_ant(3) * obj.lamda;
             rdz = obj.rx_ant(4) * obj.lamda;
@@ -195,13 +195,13 @@ classdef SCM < handle
         end
         
         
-        % ¼Û½Å´Ü°ú ¼ö½Å´ÜÀÇ ¾ÈÅ×³ª ¼ö¸¦ ÃÊ±âÈ­ ÇÏ´Â ÇÔ¼ö =====================
+        % ì†¡ì‹ ë‹¨ê³¼ ìˆ˜ì‹ ë‹¨ì˜ ì•ˆí…Œë‚˜ ìˆ˜ë¥¼ ì´ˆê¸°í™” í•˜ëŠ” í•¨ìˆ˜ =====================
         function [Rx_ant, Tx_ant] = ant(obj, N_rx, N_tx)
-            % ÀÔ·ÂÀ¸·Î ¹ÞÀº ¼Û¼ö½Å ´ÜÀÇ ¾ÈÅ×³ª ¼ö¸¦ 1Â÷¿ø ¹è¿­ ¾ÈÅ×³ª·Î °¡Á¤
+            % ìž…ë ¥ìœ¼ë¡œ ë°›ì€ ì†¡ìˆ˜ì‹  ë‹¨ì˜ ì•ˆí…Œë‚˜ ìˆ˜ë¥¼ 1ì°¨ì› ë°°ì—´ ì•ˆí…Œë‚˜ë¡œ ê°€ì •
             Rx_ant = [N_rx 1 0.5 0.5];
             Tx_ant = [N_tx 1 0.5 0.5];
             
-            % È¯°æº¯¼ö¿¡ °ªÀ» ÀúÀå
+            % í™˜ê²½ë³€ìˆ˜ì— ê°’ì„ ì €ìž¥
             obj.rx_ant = Rx_ant;
             obj.tx_ant = Tx_ant;
             obj.Nrx = Rx_ant(1) * Rx_ant(2);
@@ -209,13 +209,13 @@ classdef SCM < handle
         end
         
         
-        % Cluster ¹× ray¿¡ ÇÒ´çµÇ´Â Æò±ÕÀü·ÂÀ» °è»êÇÏ´Â ÇÔ¼ö =================
+        % Cluster ë° rayì— í• ë‹¹ë˜ëŠ” í‰ê· ì „ë ¥ì„ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ =================
         function [] = def_pow(obj)
             
-            % obj.pdp Á¤ÀÇ ¿©ºÎ È®ÀÎ
+            % obj.pdp ì •ì˜ ì—¬ë¶€ í™•ì¸
             if isempty(obj.pdp) == 1
                 
-                % Áö¼öºÐÆ÷¸¦ ±â¹ÝÀ¸·Î °¢ cluster ´ç Æò±Õ Àü·Â ÇÒ´ç
+                % ì§€ìˆ˜ë¶„í¬ë¥¼ ê¸°ë°˜ìœ¼ë¡œ ê° cluster ë‹¹ í‰ê·  ì „ë ¥ í• ë‹¹
                 pw = exp( -(1:obj.n_path) / 5 );
                 obj.pdp = ( pw / sum(pw) ).';
                 
@@ -224,29 +224,29 @@ classdef SCM < handle
                 obj.pdp = ( obj.pdp / sum(obj.pdp) ).';
             end
             
-            % obj.n_ray Á¤ÀÇ ¿©ºÎ È®ÀÎ
+            % obj.n_ray ì •ì˜ ì—¬ë¶€ í™•ì¸
             if isempty(obj.n_ray) == 1
                 obj.n_ray = ones(1,obj.n_path) * obj.n_mray;
             end
         end
         
         
-        % Cluster ¹× rayÀÇ ZoD, AoD, ZoA, AoA¸¦ °è»êÇÏ´Â ÇÔ¼ö ==============
+        % Cluster ë° rayì˜ ZoD, AoD, ZoA, AoAë¥¼ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ ==============
         function [res_angle, angle] = gen_angle(obj)
-            % c_ang: ¼Û¼ö½Å °¢µµ, c_ang = [ AoD(1:n_path); ZoD(1:n_path); AoA(1:n_path); ZoA(1:n_path); ]
-            % res_ang: ÀüÃ¼ ¼Û¼ö½Å °¢µµ
+            % c_ang: ì†¡ìˆ˜ì‹  ê°ë„, c_ang = [ AoD(1:n_path); ZoD(1:n_path); AoA(1:n_path); ZoA(1:n_path); ]
+            % res_ang: ì „ì²´ ì†¡ìˆ˜ì‹  ê°ë„
     
-            % °¢ clusterÀÇ ZoD, AoD, ZoA, AoA Áß½É °ª »ý¼º
+            % ê° clusterì˜ ZoD, AoD, ZoA, AoA ì¤‘ì‹¬ ê°’ ìƒì„±
             angle(1,:) = rand(1, obj.n_path)*pi;         % ZoD
             angle(2,:) = -pi/2 + rand(1, obj.n_path)*pi; % AoD
             angle(3,:) = rand(1, obj.n_path)*pi;         % ZoA
             angle(4,:) = -pi/2 + rand(1, obj.n_path)*pi; % AoA
             
-            % °¢ rayÀÇ ZoD, AoD, ZoA, AoA »ý¼º
+            % ê° rayì˜ ZoD, AoD, ZoA, AoA ìƒì„±
             res_angle = cell(1, obj.n_path);
             for i = 1 : obj.n_path
                 
-                % rayÀÇ ¼ö°¡ 1ÀÏ °æ¿ì¿¡´Â Áß½É °¢µµ¸¦ ±×´ë·Î ÀÌ¿ë
+                % rayì˜ ìˆ˜ê°€ 1ì¼ ê²½ìš°ì—ëŠ” ì¤‘ì‹¬ ê°ë„ë¥¼ ê·¸ëŒ€ë¡œ ì´ìš©
                 if obj.n_ray == 1, tmp_angle = angle;
                 else
                     tmp_angle = randn(4, obj.n_ray(i));
@@ -261,36 +261,36 @@ classdef SCM < handle
         end
         
         
-        % PAS¿¡ µû¸¥ rayÀÇ Æò±ÕÀü·ÂÀ» °è»êÇÏ´Â ÇÔ¼ö =========================
+        % PASì— ë”°ë¥¸ rayì˜ í‰ê· ì „ë ¥ì„ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ =========================
         function pw = pas(obj, res_angle, ray_num)
-            % res_angle: ÇöÀç cluster¿¡ ¼ÓÇÏ´Â rayÀÇ °¢µµ
-            % ray_num: Æò±ÕÀü·ÂÀ» °è»êÇØ¾ßÇÏ´Â ray Áß ÇöÀç rayÀÇ ¹øÈ£
+            % res_angle: í˜„ìž¬ clusterì— ì†í•˜ëŠ” rayì˜ ê°ë„
+            % ray_num: í‰ê· ì „ë ¥ì„ ê³„ì‚°í•´ì•¼í•˜ëŠ” ray ì¤‘ í˜„ìž¬ rayì˜ ë²ˆí˜¸
             
-            % º¯¼ö ÃÊ±âÈ­
+            % ë³€ìˆ˜ ì´ˆê¸°í™”
             [~, lay_len] = size(res_angle);
             
-            % default Æò±ÕÀü·Â ÇÒ´ç
+            % default í‰ê· ì „ë ¥ í• ë‹¹
             pw = 1 / sqrt(lay_len);
         end
         
         
-        % Ray ´ç Ã¤³Î °è¼ö¸¦ °è»êÇÏ´Â ÇÔ¼ö ===================================
+        % Ray ë‹¹ ì±„ë„ ê³„ìˆ˜ë¥¼ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ ===================================
         function [subpath_coeff] = ray_cal(obj, sample_len, ZoD, AoD, ZoA, AoA, xpr, vel)
             
-            % Á÷±³ ¹æ»çÆÐÅÏ °£¼· °è»ê
-            trx_coef = [ obj.rx_theta(ZoA); obj.rx_phi(AoA) ].';
+            % ì§êµ ë°©ì‚¬íŒ¨í„´ ê°„ì„­ ê³„ì‚°
+            trx_coef = [ obj.rx_theta(ZoA, AoA); obj.rx_phi(ZoA, AoA) ].';
             if xpr == 0, trx_coef = trx_coef * ( exp(2j*pi*rand(1)) .* [1 0; 0 -1] );
             else, trx_coef = trx_coef * ( exp(2j*pi*rand(2)) .* [1 1/sqrt(xpr); 1/sqrt(xpr) 1] ); end
-            trx_coef = trx_coef * [ obj.tx_theta(ZoD); obj.tx_phi(AoD)];
+            trx_coef = trx_coef * [ obj.tx_theta(ZoD, AoD); obj.tx_phi(ZoD, AoD)];
             
-            % ¼Û¼ö½Å ¾ÈÅ×³ª ¹ÝÀÀ º¤ÅÍ °è»ê
+            % ì†¡ìˆ˜ì‹  ì•ˆí…Œë‚˜ ë°˜ì‘ ë²¡í„° ê³„ì‚°
             rx_r = obj.cvt_S2R(ZoA, AoA);
             sub_rx = exp(2j*pi * obj.rx_d * rx_r / obj.lamda);
             tx_r = obj.cvt_S2R(ZoD, AoD);
             sub_tx = exp(2j*pi * obj.tx_d * tx_r / obj.lamda);
             trx_tmp(1,:,:) = trx_coef * sub_rx * sub_tx.';
             
-            % µµÇÃ·¯ º¤ÅÍ °è»ê
+            % ë„í”ŒëŸ¬ ë²¡í„° ê³„ì‚°
             dop_tmp = zeros(sample_len,1,2);
             if vel == 0, dop_tmp(:,1,1) = ones(sample_len,1,1);
             else
@@ -298,19 +298,19 @@ classdef SCM < handle
                 dop_tmp(:,1,1) = exp(2j*pi * vel * rx_r / obj.lamda * t_sample);
             end
             
-            % subpath °ª ´©Àû
+            % subpath ê°’ ëˆ„ì 
             subpath_coeff = repmat(trx_tmp,sample_len,1,1) .* repmat(dop_tmp(:,1,1), 1, obj.Nrx, obj.Ntx);
         end
         
         
-        % Cluter ´ç Ã¤³Î °è¼ö¸¦ °è»êÇÏ´Â ÇÔ¼ö ==================================
+        % Cluter ë‹¹ ì±„ë„ ê³„ìˆ˜ë¥¼ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ ==================================
         function [r_coeff, c_ang, res_ang] = FD_channel(obj, sample_len, i_vel)
-            % sample_len: ½Ã°£ ¿µ¿ª Ã¤³Î ±æÀÌ (¼Û½Å ½ÅÈ£ÀÇ »ùÇÃ ±æÀÌ¿Í µ¿ÀÏ)
-            % i_vel: °¢ »ùÇÃ¿¡ ´ëÇÑ ¼Óµµ º¤ÅÍ(3Â÷¿ø) e.g. [160 0 0]: x ¹æÇâÀ¸·Î 160km/h
-            % c_ang: ¼Û¼ö½Å °¢µµ c_ang = [ AoD(1:n_path); ZoD(1:n_path); AoA(1:n_path); ZoA(1:n_path); ]
-            % ang: c_ang¿¡ ´ëÇÑ subcluster °¢µµ
+            % sample_len: ì‹œê°„ ì˜ì—­ ì±„ë„ ê¸¸ì´ (ì†¡ì‹  ì‹ í˜¸ì˜ ìƒ˜í”Œ ê¸¸ì´ì™€ ë™ì¼)
+            % i_vel: ê° ìƒ˜í”Œì— ëŒ€í•œ ì†ë„ ë²¡í„°(3ì°¨ì›) e.g. [160 0 0]: x ë°©í–¥ìœ¼ë¡œ 160km/h
+            % c_ang: ì†¡ìˆ˜ì‹  ê°ë„ c_ang = [ AoD(1:n_path); ZoD(1:n_path); AoA(1:n_path); ZoA(1:n_path); ]
+            % ang: c_angì— ëŒ€í•œ subcluster ê°ë„
             
-            % º¯¼ö ÃÊ±âÈ­(¼Óµµ, ÆÄÀå, »ùÇÃ °£°Ý, ¾ÈÅ×³ª Çà·Ä, Ã¹ ¹øÂ° °æ·ÎÀÇ ÀÎµ¦½º)
+            % ë³€ìˆ˜ ì´ˆê¸°í™”(ì†ë„, íŒŒìž¥, ìƒ˜í”Œ ê°„ê²©, ì•ˆí…Œë‚˜ í–‰ë ¬, ì²« ë²ˆì§¸ ê²½ë¡œì˜ ì¸ë±ìŠ¤)
             if nargin < 3, vel = 0; else, vel = i_vel * 5/18; end
             if length(vel) < 3, vel = [vel 0 0]; end
             obj.lamda = (3e8) / obj.fc;
@@ -318,22 +318,22 @@ classdef SCM < handle
             obj.init_d();
             f_idx = 0;
             
-            % °¢ path´ç Æò±Õ Àü·Â ¹× °¢µµ¸¦ °è»ê
+            % ê° pathë‹¹ í‰ê·  ì „ë ¥ ë° ê°ë„ë¥¼ ê³„ì‚°
             obj.def_pow();
             [res_ang, c_ang] = obj.gen_angle();
             
-            % ¹æ»çÆÐÅÏ °£¼· º¯¼ö °è»ê
+            % ë°©ì‚¬íŒ¨í„´ ê°„ì„­ ë³€ìˆ˜ ê³„ì‚°
             xpr = 10.^( ( randn(obj.n_path, obj.n_mray) * obj.xpr_std + obj.xpr_mu ) / 10 );
             
-            % °¢ clusster´ç Ã¤³Î °è¼ö °è»ê
+            % ê° clussterë‹¹ ì±„ë„ ê³„ìˆ˜ ê³„ì‚°
             coeff = zeros(obj.n_path+1, sample_len, obj.Nrx, obj.Ntx);
             for i = 1:obj.n_path
                 
-                % 0 Æò±ÕÀü·ÂÀÌ ÇÒ´çµÈ °æ·Î¸¦ °è»ê Á¦¿Ü ¹× Ã¹ °æ·Î index ÀúÀå
+                % 0 í‰ê· ì „ë ¥ì´ í• ë‹¹ëœ ê²½ë¡œë¥¼ ê³„ì‚° ì œì™¸ ë° ì²« ê²½ë¡œ index ì €ìž¥
                 if obj.pdp(i) == 0, continue; 
                 elseif f_idx == 0, f_idx = i;   end
                 
-                % °¢ ray´ç Ã¤³Î °è¼ö °è»ê
+                % ê° rayë‹¹ ì±„ë„ ê³„ìˆ˜ ê³„ì‚°
                 tmp_coeff = zeros(sample_len, obj.Nrx, obj.Ntx);
                 for j = 1:obj.n_ray(i)
                     ang = res_ang{i};
@@ -342,11 +342,11 @@ classdef SCM < handle
                     tmp_coeff = tmp_coeff + sub_tmp;
                 end
                 
-                % °¢ cluster¿¡ °è¼ö ÇÒ´ç
+                % ê° clusterì— ê³„ìˆ˜ í• ë‹¹
                 coeff(i,:,:,:) = tmp_coeff * sqrt(obj.pdp(i));
             end
             
-            % LOS °è¼ö »ý¼º
+            % LOS ê³„ìˆ˜ ìƒì„±
             if (obj.los & obj.los_flag) == 1
                 Kr = 10^(obj.K/10);
                 coeff = sqrt( 1 / (Kr + 1) ) * coeff;
@@ -356,99 +356,99 @@ classdef SCM < handle
                 coeff(f_idx,:,:,:) = nlos_tmp  +  sqrt( Kr / (Kr + 1) ) * coeff_los;
             end
             
-            % »ó´ë°Å¸®¸¦ ¹Ý¿µ
+            % ìƒëŒ€ê±°ë¦¬ë¥¼ ë°˜ì˜
             p_loss = -10 * obj.exp_beta * log10(obj.distance_rate);
             shadowing = randn(1) * obj.sdw_std;
             loss = 10^( (p_loss + shadowing) / 10 );
             coeff = coeff * sqrt(loss);
             
-            % Ãâ·Â°ª ÀúÀå
+            % ì¶œë ¥ê°’ ì €ìž¥
             r_coeff = coeff(1:obj.n_path,:,:,:);
         end
         
         
-        % Ã¤³Î °è¼ö¸¦ ÀÌ¿ëÇÏ¿© ¼ö½Å ½ÅÈ£¸¦ °è»êÇÏ´Â ÇÔ¼ö =====================
+        % ì±„ë„ ê³„ìˆ˜ë¥¼ ì´ìš©í•˜ì—¬ ìˆ˜ì‹  ì‹ í˜¸ë¥¼ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ =====================
         function [rx_sig] = FD_fading(obj, sig, coeff)
             
-            % ¸Å°³º¯¼ö ÃÊ±âÈ­
+            % ë§¤ê°œë³€ìˆ˜ ì´ˆê¸°í™”
             [tap_len, sym_len, N_rx, N_tx] = size(coeff);
             
-            % ¼Û½Å ½ÅÈ£¿¡ Ã¤³Î °è¼ö Àû¿ë
+            % ì†¡ì‹  ì‹ í˜¸ì— ì±„ë„ ê³„ìˆ˜ ì ìš©
             temp = zeros(tap_len, sym_len, N_rx);
             for i = 1:N_rx
                 for j = 1:N_tx
-                    % ¼ö½Å ¾ÈÅ×³ª¸¶´Ù Ã¤³Î°ú ¼Û½Å ½ÅÈ£ ³»Àû
+                    % ìˆ˜ì‹  ì•ˆí…Œë‚˜ë§ˆë‹¤ ì±„ë„ê³¼ ì†¡ì‹  ì‹ í˜¸ ë‚´ì 
                     temp(:,:,i) = temp(:,:,i) + coeff(:,:,i,j) .* ( ones(tap_len,1) * sig(j,:) ) ;
                 end
             end
             
-            % ´ÙÁß °æ·Î Àû¿ë
+            % ë‹¤ì¤‘ ê²½ë¡œ ì ìš©
             rx_sig = zeros(N_rx, sym_len + tap_len -1);
             for m = 1:N_rx
-                % ´ÙÁß °æ·Î ¹è¿­ »ý¼º
+                % ë‹¤ì¤‘ ê²½ë¡œ ë°°ì—´ ìƒì„±
                 flat_m = zeros(tap_len, sym_len + tap_len -1);
                 
                 for i = 1:tap_len
                     flat_m(i, i:i + sym_len - 1) = temp(i,:,m);
                 end
                 
-                % ´ÙÁß °æ·Î ÁßÃ¸
+                % ë‹¤ì¤‘ ê²½ë¡œ ì¤‘ì²©
                 rx_sig(m,:) = sum( flat_m, 1 );
             end
         end
         
-        % ÁÖ¾îÁø Áö¿¬½Ã°£ ¹× Æò±ÕÀü·ÂÀ» ÅëÇØ ½Ã½ºÅÛ¿¡ ¸Â´Â PDP¸¦ °è»êÇÏ´Â ÇÔ¼ö
+        % ì£¼ì–´ì§„ ì§€ì—°ì‹œê°„ ë° í‰ê· ì „ë ¥ì„ í†µí•´ ì‹œìŠ¤í…œì— ë§žëŠ” PDPë¥¼ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜
         function [] = pdp_interp(obj, delay, power)
             % Delay [sec]
             % power [Watt]
             
-            % ±æÀÌ°¡ ´Ù¸¦ °æ¿ì Á¾·á
+            % ê¸¸ì´ê°€ ë‹¤ë¥¼ ê²½ìš° ì¢…ë£Œ
             if length(delay) ~= length(power)
                 disp( 'The sizes of delay and power doesn not match ')
                 return
             end
             
-            % PDP º¤ÅÍ »ý¼º
+            % PDP ë²¡í„° ìƒì„±
             ts = 1/obj.fs;
             
-            % index ½ÃÀÛ À§Ä¡ ¹× ´ÙÀ½ °è¼ö·ÎÀÇ Àü·Â ºÐ»êÀ¸·Î ÀÎÇÑ ±æÀÌ ¿¬Àå '2'
+            % index ì‹œìž‘ ìœ„ì¹˜ ë° ë‹¤ìŒ ê³„ìˆ˜ë¡œì˜ ì „ë ¥ ë¶„ì‚°ìœ¼ë¡œ ì¸í•œ ê¸¸ì´ ì—°ìž¥ '2'
             len = ceil( max(delay) / ts ) + 2;
             obj.pdp = zeros(1, len);
             
-            % ¿Ã¸²ÇÏ¿© À§Ä¡ °è»ê
+            % ì˜¬ë¦¼í•˜ì—¬ ìœ„ì¹˜ ê³„ì‚°
             coef = floor( delay / ts);
             relative_d = abs(delay / ts - coef);
             p0 = (1-relative_d) .* power;
             p1 = relative_d .* power;
             
-            % Power °ªÀ» °è»êÇÏ¿© ÀúÀå
+            % Power ê°’ì„ ê³„ì‚°í•˜ì—¬ ì €ìž¥
             for i = 1:length(delay)
                 idx = coef(i)+1;
                 obj.pdp( idx ) = obj.pdp( idx ) + p0(i);
                 obj.pdp( idx+1) = obj.pdp( idx+1 ) + p1(i) ;
             end
             
-            % Á¤±ÔÈ­ ¼öÇà
+            % ì •ê·œí™” ìˆ˜í–‰
             obj.pdp = obj.pdp / sum(obj.pdp);
             
         end
         
-        % °Å¸® ¹× ¼Û½Å Àü·ÂÀ» ±â¹ÝÀ¸·Î ½ÅÈ£ÀÇ ¼ö½Å SNRÀ» °è»êÇÏ´Â ÇÔ¼ö ========
+        % ê±°ë¦¬ ë° ì†¡ì‹  ì „ë ¥ì„ ê¸°ë°˜ìœ¼ë¡œ ì‹ í˜¸ì˜ ìˆ˜ì‹  SNRì„ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜ ========
         function [snr] = path_loss(obj, tx_psd, bandwidth, distance)
-            % tx_psd: Àü¼Û ½ÅÈ£ÀÇ Æò±Õ PSD(Power Spectral Density) [dB/Hz]
-            % bandwith: Àü¼Û ½ÅÈ£ÀÇ ´ë¿ªÆø
+            % tx_psd: ì „ì†¡ ì‹ í˜¸ì˜ í‰ê·  PSD(Power Spectral Density) [dB/Hz]
+            % bandwith: ì „ì†¡ ì‹ í˜¸ì˜ ëŒ€ì—­í­
             
-            % º¯¼ö ÃÊ±âÈ­
+            % ë³€ìˆ˜ ì´ˆê¸°í™”
             if nargin < 4
                 distance  =  sqrt( sum( (obj.p_src - obj.p_dst).^2 ) );
             end
             
-            % ¼Û½Å, ÀâÀ½ Àü·Â ¹× path loss °è»ê
+            % ì†¡ì‹ , ìž¡ìŒ ì „ë ¥ ë° path loss ê³„ì‚°
             tx_power = 10^(tx_psd/10) * bandwidth;
             N_power = 10^(obj.No/10) * bandwidth;
             p_loss = -20 .* log10( 4*pi / obj.lamda ) - 10 .* obj.exp_beta .* log10( distance ) - obj.L + obj.Gt + obj.Gr;
             
-            % Shadowing Çö»óÀ» ¹Ý¿µÇÏ¿© SNRÀ» °è»ê
+            % Shadowing í˜„ìƒì„ ë°˜ì˜í•˜ì—¬ SNRì„ ê³„ì‚°
             shadowing = randn(1) * obj.sdw_std;
             loss = 10^( (p_loss + shadowing) / 10 );
             rx_power = tx_power * loss;
