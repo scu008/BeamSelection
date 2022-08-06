@@ -3,15 +3,15 @@ clear, clc
 iter = 20000;
 
 % 양자화 bit 수(아날로그 빔, 채널 정보)
-b_bit = 6;
-h_bit = 6;
-cs_dim = 3;
+b_bit = 3;
+h_bit = 4;
+cs_dim = 2;
 
 % 채널 모델 변수 설정
-fft_len = 128;
+fft_len = 64;
 Ntx = 2^b_bit;
-Nrx = 4;
-path = 3;
+Nrx = 1;
+path = 2;
 ray = 10;
 model = SCM();
 model.n_mray = ray;
