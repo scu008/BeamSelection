@@ -25,11 +25,13 @@ classdef SCM < handle
         zsd             % ZSD 값
         asa             % ASA 값
         zsa             % ZSA 값
+        xpr             % XPR 값
         xpr_mu          % 직교 패턴간 간섭 비율 기댓값 10^(x/10), x-normal dist
         xpr_std         % 직교 패턴간 간섭 비율 표준편차 10^(x/10), x-normal dist
         pdp             % Power Delay Profile (PDP)
         c_ang           % Ray의 중심 각도가 저장된 벡터: [ZoD; AoD; ZoA; AoA;] per path(column vector)
         full_ang        % 모든 Ray의 각도 값을 저장하는 cell 배열: full_ang{i} = ang of every ray per path
+        pasf            % PAS 계산을 위한 함수
 
         % Large scale 변수
         Gt              % 송신단의 안테나 Gain [dB]
@@ -88,8 +90,8 @@ classdef SCM < handle
             obj.Ts = [];
             obj.tx_ant = [1 1 0.5 0.5];
             obj.rx_ant = [1 1 0.5 0.5];
-            obj.tx_array = [0 0 0];
-            obj.rx_array = [0 0 0];
+            obj.tx_array = [];
+            obj.rx_array = [];
             obj.Ntx = [];
             obj.Nrx = [];
             obj.n_path = 7;
@@ -99,11 +101,13 @@ classdef SCM < handle
             obj.zsd = 3;
             obj.asa = 3;
             obj.zsa = 3;
+            obj.xpr = [];
             obj.xpr_mu = 8;
             obj.xpr_std = 3;
             obj.pdp = [];
             obj.c_ang = [];
             obj.full_ang = [];
+            obj.pasf = @(theta, phi, path) ones(size(theta));
 
             % Large scale 초기값 설정
             obj.Gt = 0;
@@ -264,8 +268,17 @@ classdef SCM < handle
         % Cluster 및 ray에 할당되는 평균전력을 계산하는 함수 =================
         function [] = def_pow(obj)
 
+            % 변수 초기화
+            if (obj.n_path ~= obj.pdp)
+                obj.pdp = [];
+                obj.n_ray = [];
+                obj.c_ang = [];
+                obj.full_ang = [];
+                obj.xpr = [];
+            end
+
             % obj.pdp 정의 여부 확인
-            if isempty(obj.pdp) == 1
+            if isempty(obj.pdp)
 
                 % 지수분포를 기반으로 각 cluster 당 평균 전력 할당
                 pw = exp( -(1:obj.n_path) / 5 );
@@ -281,7 +294,13 @@ classdef SCM < handle
                 if isempty(obj.full_ang)
                     obj.n_ray = ones(1, obj.n_path) * obj.n_mray;
                 else
-                    for i = 1:obj.n_path, obj.n_ray(i) = size(obj.full_ang{i},2); end
+                    % obj.full_ang가 정의된 경우 n_ray와 n_mray를 저장
+                    n_mray = 0;
+                    for i = 1:obj.n_path
+                        obj.n_ray(i) = size(obj.full_ang{i},2); 
+                        n_mray = (obj.n_ray(i) > n_mray) * obj.n_ray(i);
+                    end
+                    obj.n_mray = n_mray;
                 end
             end
         end
@@ -321,20 +340,29 @@ classdef SCM < handle
                 end
             else
                 res_angle = obj.full_ang;
+
+                % 중심각 계산 후 저장
+                if isempty(obj.c_ang)
+                    for i = 1:obj.n_path
+                        ray_ang = res_angle{i};
+                        c_angle(:,i) = mean(ray_ang,2);
+                    end
+                end
             end
         end
 
 
         % PAS에 따른 ray의 평균전력을 계산하는 함수 =========================
-        function pw = pas(obj, res_angle, ray_num)
-            % res_angle: 현재 cluster에 속하는 ray의 각도
-            % ray_num: 평균전력을 계산해야하는 ray 중 현재 ray의 번호
+        function pw = pas(obj, res_ang, c_ang, path)
+            % res_angle: 현재 cluster에 속하는 ray들의 각도(ZoD, AoD, ZoA, AoA)
+            % c_ang: cluster의 중간 각도
 
-            % 변수 초기화
-            [~, lay_len] = size(res_angle);
+            % PAS 함수가 정의된 경우 전련 분산 계산
+            tmp_ang = res_ang - c_ang;
+            pw = obj.pasf(tmp_ang(3,:), tmp_ang(4,:), path);
 
-            % default 평균전력 할당
-            pw = 1 / sqrt(lay_len);
+            % 전력 정규화
+            pw = pw / sqrt(sum(abs(pw).^2));
         end
 
 
@@ -385,7 +413,11 @@ classdef SCM < handle
             [res_ang, c_ang] = obj.gen_angle();
 
             % 방사패턴 간섭 변수 계산
-            xpr = 10.^( ( randn(obj.n_path, obj.n_mray) * obj.xpr_std + obj.xpr_mu ) / 10 );
+            if isempty(obj.xpr) 
+                xpr = 10.^( ( randn(obj.n_path, obj.n_mray) * obj.xpr_std + obj.xpr_mu ) / 10 );
+            else
+                xpr = obj.xpr;
+            end
 
             % 각 cluster당 채널 계수 계산
             coeff = zeros(obj.n_path+1, sample_len, obj.Nrx, obj.Ntx);
@@ -397,10 +429,11 @@ classdef SCM < handle
 
                 % 각 ray당 채널 계수 계산
                 tmp_coeff = zeros(sample_len, obj.Nrx, obj.Ntx);
+                ang = res_ang{i};
+                ray_pow = obj.pas(ang, c_ang(:,i), i);
                 for j = 1:obj.n_ray(i)
-                    ang = res_ang{i};
                     sub_tmp = obj.ray_cal(sample_len, ang(1,j), ang(2,j), ang(3,j), ang(4,j), xpr(i,j), vel);
-                    sub_tmp = sub_tmp * obj.pas(ang, j);
+                    sub_tmp = sub_tmp * ray_pow(j);
                     tmp_coeff = tmp_coeff + sub_tmp;
                 end
 
@@ -460,18 +493,18 @@ classdef SCM < handle
         end
 
 
-        % OFDM과 같은 다중 반송파 신호에 대해 fading을 반영하여 수신 신호 집합을 계산
-        function [rx_sig, h] = MC_fading(obj, freq_list, sig, vel)
+        % OFDM과 같은 다중 반송파 신호에 대해 fading을 반영을 위한 채널 계수를 생성
+        function [h, c_ang_, full_ang_] = MC_channel(obj, freq_list, sig_len, vel)
 
             % 초기 변수 설정
             if nargin < 4, vel = 0; end
             ang_fix = 0;
+            xpr_fix = 0;
             tmp_fc = obj.fc;
             obj.init_d();
 
             % 다중 반송파마다 fading 적용
-            rx_sig = zeros(length(freq_list), size(obj.rx_d,1), size(sig,2) + obj.n_path - 1);
-            h = zeros(length(freq_list), obj.n_path, size(sig,2), size(obj.rx_d,1), size(obj.tx_d,1));
+            h = zeros(length(freq_list), obj.n_path, sig_len, size(obj.rx_d,1), size(obj.tx_d,1));
             for i = 1:length(freq_list)
 
                 % 각도 조건 확인
@@ -479,30 +512,49 @@ classdef SCM < handle
                     if isempty(obj.c_ang), ang_fix = 1; end
                     if isempty(obj.full_ang), ang_fix = 2; end
                     if isempty(obj.c_ang) && isempty(obj.full_ang), ang_fix = 3; end
+                    if isempty(obj.xpr), xpr_fix = 1; end
                     
                     % 고정 각도 저장
                     if ang_fix > 0
                         obj.def_pow();
-                        [obj.full_ang, obj.c_ang] = obj.gen_angle();
+                        [full_ang_, c_ang_] = obj.gen_angle();
+                        obj.full_ang = full_ang_;
+                        obj.c_ang = c_ang_;
                     end
+                    if xpr_fix == 1, obj.xpr = 10.^( ( randn(obj.n_path, obj.n_mray) * obj.xpr_std + obj.xpr_mu ) / 10 ); end
                 end
 
                 % 각 주파수 부반송파마다 채널 계수를 계산하고 fading을 적용
                 obj.fc = freq_list(i);
-                h_(1:obj.n_path, 1:size(sig,2), 1:size(obj.rx_d,1), :) = obj.FD_channel(size(sig,2), vel);
-                h(i, 1:obj.n_path, 1:size(sig,2), 1:size(obj.rx_d,1), :) = h_;
-                rx_sig(i, 1:size(obj.rx_d,1), :) = obj.FD_fading(sig, h_);
+                h(i, 1:obj.n_path, 1:sig_len, 1:size(obj.rx_d,1), :) = obj.FD_channel(sig_len, vel);
             end
 
-            % 각도 조건 초기화
+            % obj 멤버 변수 초기화 검토
             if ang_fix == 1, obj.c_ang = []; end
             if ang_fix == 2, obj.full_ang = []; end
             if ang_fix == 3
                 obj.c_ang = [];
                 obj.full_ang = [];
             end
+            if xpr_fix == 1, obj.xpr = []; end
             obj.fc = tmp_fc;
 
+        end
+        
+        % OFDM과 같은 다중 반송파 신호에 대해 fading을 반영하여 수신 신호 집합을 계산
+        function [y] = MC_fading(obj, sig, coeff)
+
+            % 초기 변수 설정
+            [freq_num, path, sig_len, Nr, Nt] = size(coeff);
+            len = path + sig_len - 1;
+            y = zeros(freq_num, Nr, len);
+
+            % Fading 계산
+            for i = 1:freq_num
+                tmp(1:path, 1:sig_len, 1:Nr, 1:Nt) = coeff(i,:,:,:,:);
+                y(i, 1:Nr, 1:len) = obj.FD_fading(sig, tmp);
+            end
+            
         end
 
 
