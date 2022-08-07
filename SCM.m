@@ -357,7 +357,7 @@ classdef SCM < handle
             % res_angle: 현재 cluster에 속하는 ray들의 각도(ZoD, AoD, ZoA, AoA)
             % c_ang: cluster의 중간 각도
 
-            % PAS 함수가 정의된 경우 전련 분산 계산
+            % PAS 함수가 정의된 경우 전력 분산 계산
             tmp_ang = res_ang - c_ang;
             pw = obj.pasf(tmp_ang(3,:), tmp_ang(4,:), path);
 
