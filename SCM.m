@@ -130,6 +130,10 @@ classdef SCM < handle
             % Cross-pole인 경우 sqrt(A(theta, phi))*cos(angle)과 sqrt(A(theta, phi))*sin(angle)
             obj.tx_pattern = @(theta, phi) ones(size(theta));
             obj.rx_pattern = @(theta, phi) ones(size(theta));
+            obj.tx_theta = [];
+            obj.tx_phi = [];
+            obj.rx_theta = [];
+            obj.rx_phi = [];
             obj.tx_pole = 1;
             obj.rx_pole = 1;
             obj.tx_slant = pi/4;
@@ -233,20 +237,24 @@ classdef SCM < handle
             [obj.Nrx, ~] = size(obj.rx_d);
 
             % 방사패턴 설정
-            if obj.tx_pole == 2
-                obj.tx_theta = @(theta, phi) sqrt(obj.tx_pattern(theta, phi)) * cos(obj.tx_slant);
-                obj.tx_phi = @(theta, phi) sqrt(obj.tx_pattern(theta, phi)) * sin(obj.tx_slant);
-            elseif obj.tx_pole ~= 2
-                obj.tx_theta = @(theta, phi) sqrt(obj.tx_pattern(theta, phi));
-                obj.tx_phi = @(theta, phi) 0;
+            if isempty(obj.tx_theta)
+                if obj.tx_pole == 2
+                    obj.tx_theta = @(theta, phi) sqrt(obj.tx_pattern(theta, phi)) * cos(obj.tx_slant);
+                    obj.tx_phi = @(theta, phi) sqrt(obj.tx_pattern(theta, phi)) * sin(obj.tx_slant);
+                elseif obj.tx_pole ~= 2
+                    obj.tx_theta = @(theta, phi) sqrt(obj.tx_pattern(theta, phi));
+                    obj.tx_phi = @(theta, phi) 0;
+                end
             end
 
-            if obj.rx_pole == 2
-                obj.rx_theta = @(theta, phi) sqrt(obj.rx_pattern(theta, phi)) * cos(obj.rx_slant);
-                obj.rx_phi = @(theta, phi) sqrt(obj.rx_pattern(theta, phi)) * sin(obj.rx_slant);
-            elseif obj.rx_pole ~= 2
-                obj.rx_theta = @(theta, phi) sqrt(obj.rx_pattern(theta, phi));
-                obj.rx_phi = @(theta, phi) 0;
+            if isempty(obj.rx_theta)
+                if obj.rx_pole == 2
+                    obj.rx_theta = @(theta, phi) sqrt(obj.rx_pattern(theta, phi)) * cos(obj.rx_slant);
+                    obj.rx_phi = @(theta, phi) sqrt(obj.rx_pattern(theta, phi)) * sin(obj.rx_slant);
+                elseif obj.rx_pole ~= 2
+                    obj.rx_theta = @(theta, phi) sqrt(obj.rx_pattern(theta, phi));
+                    obj.rx_phi = @(theta, phi) 0;
+                end
             end
         end
 
