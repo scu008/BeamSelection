@@ -20,6 +20,7 @@ classdef SCM < handle
         Nrx             % 수신단의 안테나 수
         n_path          % 채널의 path(cluster)의 수
         n_mray          % 채널의 path당 ray의 최대 개수
+        n_msubclt       % 채널의 path당 subcluster의 최대 개수
         n_ray           % 채널의 path당 ray의 수
         asd             % ASD 값
         zsd             % ZSD 값
@@ -96,6 +97,7 @@ classdef SCM < handle
             obj.Nrx = [];
             obj.n_path = 7;
             obj.n_mray = 15;
+            obj.n_msubclt = 1;
             obj.n_ray = [];
             obj.asd = 3;
             obj.zsd = 3;
@@ -277,12 +279,9 @@ classdef SCM < handle
         function [] = def_pow(obj)
 
             % 변수 초기화
-            if (obj.n_path ~= obj.pdp)
+            if (obj.n_path ~= length(obj.pdp))
                 obj.pdp = [];
                 obj.n_ray = [];
-                obj.c_ang = [];
-                obj.full_ang = [];
-                obj.xpr = [];
             end
 
             % obj.pdp 정의 여부 확인
@@ -294,22 +293,19 @@ classdef SCM < handle
 
             else
                 obj.n_path = length(obj.pdp);
-                obj.pdp = ( obj.pdp / sum(obj.pdp) ).';
             end
 
             % obj.n_ray 정의 여부 확인
-            if isempty(obj.n_ray)
-                if isempty(obj.full_ang)
-                    obj.n_ray = ones(1, obj.n_path) * obj.n_mray;
-                else
-                    % obj.full_ang가 정의된 경우 n_ray와 n_mray를 저장
-                    n_mray = 0;
-                    for i = 1:obj.n_path
-                        obj.n_ray(i) = size(obj.full_ang{i},2); 
-                        n_mray = (obj.n_ray(i) > n_mray) * obj.n_ray(i);
-                    end
-                    obj.n_mray = n_mray;
+            if isempty(obj.full_ang)
+                obj.n_ray = ones(1, obj.n_path) * obj.n_mray;
+            else
+                % obj.full_ang가 정의된 경우 n_ray와 n_mray를 저장
+                n_mray = 0;
+                for i = 1:obj.n_path
+                    obj.n_ray(i) = size(obj.full_ang{i},2);
+                    n_mray = (obj.n_ray(i) > n_mray) * obj.n_ray(i);
                 end
+                obj.n_mray = n_mray;
             end
         end
 
@@ -319,43 +315,40 @@ classdef SCM < handle
             % c_ang: 송수신 각도, c_ang = [ ZoD(1:n_path); AoD(1:n_path); ZoA(1:n_path); AoA(1:n_path); ]
             % res_ang: 전체 송수신 각도
 
-            % 각 cluster의 ZoD, AoD, ZoA, AoA 중심 값 생성
-            if isempty(obj.c_ang)
-                c_angle(1,:) = rand(1, obj.n_path)*pi;         % ZoD
-                c_angle(2,:) = -pi/2 + rand(1, obj.n_path)*pi; % AoD
-                c_angle(3,:) = rand(1, obj.n_path)*pi;         % ZoA
-                c_angle(4,:) = -pi/2 + rand(1, obj.n_path)*pi; % AoA
-            else
-                c_angle = obj.c_ang;
-            end
-
             % 각 ray의 ZoD, AoD, ZoA, AoA 생성
+            c_angle = cell(1, obj.n_path);
+            res_angle = cell(1, obj.n_path);
             if isempty(obj.full_ang)
-                res_angle = cell(1, obj.n_path);
                 for i = 1 : obj.n_path
 
-                    % ray의 수가 1일 경우에는 중심 각도를 그대로 이용
-                    if obj.n_ray(i) == 1, tmp_angle = c_angle;
+                    % Central angle 생성
+                    c_angle_(1,:) = rand(1, obj.n_msubclt)*pi;         % ZoD
+                    c_angle_(2,:) = -pi/2 + rand(1, obj.n_msubclt)*pi; % AoD
+                    c_angle_(3,:) = rand(1, obj.n_msubclt)*pi;         % ZoA
+                    c_angle_(4,:) = -pi/2 + rand(1, obj.n_msubclt)*pi; % AoA
+                    c_angle__ = reshape( repmat(c_angle_, ceil(obj.n_ray(i) / obj.n_msubclt), 1), 4, ceil(obj.n_ray(i) / obj.n_msubclt)*obj.n_msubclt );
+                    c_angle{i} = c_angle__(:,1:obj.n_ray(i));
+
+                    % 모든 ray의 각도 생성
+                    if obj.n_ray(i) == 1, tmp_angle = c_angle{i};
                     else
+                        % 중심 각 0도에 대해 ray 각도 생성
                         tmp_angle = randn(4, obj.n_ray(i));
-                        tmp_angle(1,:) = tmp_angle(1,:) * (obj.zsd * pi/180) + c_angle(1,i);
-                        tmp_angle(2,:) = tmp_angle(2,:) * (obj.asd * pi/180) + c_angle(2,i);
-                        tmp_angle(3,:) = tmp_angle(3,:) * (obj.zsa * pi/180) + c_angle(3,i);
-                        tmp_angle(4,:) = tmp_angle(4,:) * (obj.asa * pi/180) + c_angle(4,i);
+                        tmp_angle(1,:) = tmp_angle(1,:) * (obj.zsd * pi/180);
+                        tmp_angle(2,:) = tmp_angle(2,:) * (obj.asd * pi/180);
+                        tmp_angle(3,:) = tmp_angle(3,:) * (obj.zsa * pi/180);
+                        tmp_angle(4,:) = tmp_angle(4,:) * (obj.asa * pi/180);
+
+                        % Subcluster의 중심 각도 적용
+                        tmp_angle = tmp_angle + c_angle{i};
                     end
                     res_angle{i} = tmp_angle;
 
                 end
             else
                 res_angle = obj.full_ang;
-
-                % 중심각 계산 후 저장
-                if isempty(obj.c_ang)
-                    for i = 1:obj.n_path
-                        ray_ang = res_angle{i};
-                        c_angle(:,i) = mean(ray_ang,2);
-                    end
-                end
+                if isempty(obj.c_ang) c_angle = res_angle;
+                else c_angle = obj.c_ang; end
             end
         end
 
@@ -421,7 +414,7 @@ classdef SCM < handle
             [res_ang, c_ang] = obj.gen_angle();
 
             % 방사패턴 간섭 변수 계산
-            if isempty(obj.xpr) 
+            if isempty(obj.xpr)
                 xpr = 10.^( ( randn(obj.n_path, obj.n_mray) * obj.xpr_std + obj.xpr_mu ) / 10 );
             else
                 xpr = obj.xpr;
@@ -438,7 +431,7 @@ classdef SCM < handle
                 % 각 ray당 채널 계수 계산
                 tmp_coeff = zeros(sample_len, obj.Nrx, obj.Ntx);
                 ang = res_ang{i};
-                ray_pow = obj.pas(ang, c_ang(:,i), i);
+                ray_pow = obj.pas(ang, c_ang{i}, i);
                 for j = 1:obj.n_ray(i)
                     sub_tmp = obj.ray_cal(sample_len, ang(1,j), ang(2,j), ang(3,j), ang(4,j), xpr(i,j), vel);
                     sub_tmp = sub_tmp * ray_pow(j);
@@ -517,13 +510,11 @@ classdef SCM < handle
 
                 % 각도 조건 확인
                 if i == 1
-                    if isempty(obj.c_ang), ang_fix = 1; end
-                    if isempty(obj.full_ang), ang_fix = 2; end
-                    if isempty(obj.c_ang) && isempty(obj.full_ang), ang_fix = 3; end
+                    if isempty(obj.full_ang), ang_fix = 1; end
                     if isempty(obj.xpr), xpr_fix = 1; end
-                    
+
                     % 고정 각도 저장
-                    if ang_fix > 0
+                    if ang_fix == 1
                         obj.def_pow();
                         [full_ang_, c_ang_] = obj.gen_angle();
                         obj.full_ang = full_ang_;
@@ -538,9 +529,7 @@ classdef SCM < handle
             end
 
             % obj 멤버 변수 초기화 검토
-            if ang_fix == 1, obj.c_ang = []; end
-            if ang_fix == 2, obj.full_ang = []; end
-            if ang_fix == 3
+            if ang_fix == 1
                 obj.c_ang = [];
                 obj.full_ang = [];
             end
@@ -548,7 +537,7 @@ classdef SCM < handle
             obj.fc = tmp_fc;
 
         end
-        
+
         % OFDM과 같은 다중 반송파 신호에 대해 fading을 반영하여 수신 신호 집합을 계산
         function [y] = MC_fading(obj, sig, coeff)
 
@@ -562,7 +551,7 @@ classdef SCM < handle
                 tmp(1:path, 1:sig_len, 1:Nr, 1:Nt) = coeff(i,:,:,:,:);
                 y(i, 1:Nr, 1:len) = obj.FD_fading(sig, tmp);
             end
-            
+
         end
 
 
