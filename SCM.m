@@ -397,7 +397,7 @@ classdef SCM < handle
 
 
         % Cluter 당 채널 계수를 계산하는 함수 ==================================
-        function [r_coeff, c_ang, res_ang] = FD_channel(obj, sample_len, i_vel)
+        function [r_coeff, c_ang, res_ang, xpr] = FD_channel(obj, sample_len, i_vel)
             % sample_len: 시간 영역 채널 길이 (송신 신호의 샘플 길이와 동일)
             % i_vel: 각 샘플에 대한 속도 벡터(3차원) e.g. [160 0 0]: x 방향으로 160km/h
             % c_ang: 송수신 각도 c_ang = [ ZoD(1:n_path); AoD(1:n_path); ZoA(1:n_path); AoA(1:n_path); ]
@@ -495,7 +495,7 @@ classdef SCM < handle
 
 
         % OFDM과 같은 다중 반송파 신호에 대해 fading을 반영을 위한 채널 계수를 생성
-        function [h, c_ang_, full_ang_] = MC_channel(obj, freq_list, sig_len, vel)
+        function [h, c_ang_, full_ang_, xpr_] = MC_channel(obj, freq_list, sig_len, vel)
 
             % 초기 변수 설정
             if nargin < 4, vel = 0; end
@@ -521,6 +521,7 @@ classdef SCM < handle
                         obj.c_ang = c_ang_;
                     end
                     if xpr_fix == 1, obj.xpr = 10.^( ( randn(obj.n_path, obj.n_mray) * obj.xpr_std + obj.xpr_mu ) / 10 ); end
+                    xpr_ = obj.xpr;                    
                 end
 
                 % 각 주파수 부반송파마다 채널 계수를 계산하고 fading을 적용
